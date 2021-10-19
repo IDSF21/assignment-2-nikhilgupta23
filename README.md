@@ -2,7 +2,7 @@
 
 We present a small preview into the history of the music industry, using data collected from a popular music streaming service, Spotify. Music is an essential part of every individual's life; we try to capture the trends and shifts of influence, of different genres, and different artists, through the years, to answer some compelling questions.
 
-## Brief Introduction: Data Collections
+## Brief Introduction: Data Collection
 
 For this project, we applied the principles and concepts learnt earlier in this class, to source and curate our own dataset (Notebook to collect data attached). Spotify exposes a set of Web API endpoints for Developers to use (https://developer.spotify.com/documentation/web-api/). We used this to do the following tasks:
 * Create a list of playlists of Top 100 songs of each year, using Spotify search API. *Note: We have only used Spotify curated playlists to prevent bias*
@@ -37,6 +37,6 @@ We split the tasks equally between us through all processes of the assignment. O
 * Making inferences and observations based on the questions we asked
 
 ### Time Analysis
-* ~5 hours on Data Curation
-* ~6 hours on Creating Visualizations
-* ~3 hours on Inferences, Writeup, Deployment
+* ~6 hours on Data Curation
+* ~7 hours on Learning Streamlit, Creating Visualizations + Code
+* ~4 hours on Inferences, Writeup, Deployment
