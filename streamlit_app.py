@@ -8,7 +8,7 @@ from sklearn.feature_selection import SelectKBest, chi2
 import plotly.express as px
 
 st.set_page_config(  # Alternate names: setup_page, page, layout
-	layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
+	layout="centered",  # Can be "centered" or "wide". In the future also "dashboard", etc.
 	initial_sidebar_state="auto",  # Can be "auto", "expanded", "collapsed"
 	page_title="A Journey through time with Music",  # String or None. Strings get appended with "• Streamlit". 
 	page_icon="🎵",  # String, anything supported by st.image, or None.
@@ -49,14 +49,32 @@ Here is a brief description of the features, to help make sense of the above gra
 
 (Source: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
 
+""")
+
+st.subheader('What we observe')
+
+st.write("""
+
+Let's first look at the trend of features in the 21st Century
+
+* We see that 2000 starts out with happy, positive songs (high valence scores) full of energy
+* Focusing on *Speechiness*, we see that the songs in 2000's have more wordings than those later in the decade. This is due to the high population of **Rap/Hip Hop** songs, that have more words, hence higher speechiness scores. 
+* As we travel through time to reach the 2010's, we see a downtrend in the general energy and valence of the songs released, and appreciated by listeners. This can be seen via the rise of artists like Khalid and The Weeknd, who tend to have mellow beats, and sullen themes. 
+* Today's music scene is characterized by lower energy, higher acousticness, more lyrics, and more mellow themes as compared to the last 5 years. Music by Billie Eilish is a prime example of the music this generation appreciates, and captures this trend
+
+
 ---
 
 """)
 
-option = st.slider('Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
-st.header('Year in Focus: ' + str(option))
+
+# -------------------------------------------------------------------------------------------------------
 
 # Genres Distribution
+option = st.slider('Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
+
+st.header('Year in Focus: ' + str(option))
+
 st.subheader("Genres in Top 100")
 
 def normalize(d, target=1.0):
@@ -84,7 +102,7 @@ with col1:
         'Genre': genres_dict.keys(),
         'Percentage of Top 100': genres_dict.values()
     }, columns=['Genre', 'Percentage of Top 100'])
-    px_bar = px.bar(df_genre, x='Genre', y='Percentage of Top 100', color='Genre', color_discrete_sequence = px.colors.qualitative.G10, range_y=[0,50])
+    px_bar = px.bar(df_genre, x='Genre', y='Percentage of Top 100', color='Genre', color_discrete_sequence = px.colors.qualitative.G10, range_y=[0,60])
     st.plotly_chart(px_bar, use_container_width=True)
 
 
@@ -94,9 +112,23 @@ with col2:
     for genre in yearly_top_genres:
         st.write('##### ' + genre)
 
+st.write("""
+
+Here, we present a journey through time, looking at the composition of the Top 100 songs classified by genre, over the last 30 years. Spotify gave us multiple different genres, however we have considered the parent genres in this analysis (Example: Alternative Rock, Classic Rock -> Rock, Tropical House, Electro House, Deep House -> House). 
+
+At the start of the 90's we see Rock music domination, followed by Pop music, House and Dance music following. Mid to late 90's show an upward trend in Pop Music, and influence of Rock Music is reducing. However, there is a new genre being nurtured, which is Hip Hop. The 90's are considered the Golden Age for Hip Hop and Rap music. 
+
+The 2000's saw a rise in Hip Hop, Dance music, as well as R&B, with artists like Beyonce gaining traction. The 2010's did not show much variations, however we see a reintroduction of Rap music into the mainstream.
+
+With this, let's try to answer this question:
+> Did the Golden Era of Hip-Hop (the 90's for those wondering) actually give enough chart toppers? Was it able to compete with Rock and Pop from the top?
+
+From the graph it is pretty clear, that Hip Hop and Rap music gained massive popularity through later 90's and early 2000's, through breakthrough artists in the Compton region of NY, Snoop Dogg, Dr. Dre, among others. However, Pop and Rock continue to be the best performing genres, when it comes to Top Songs charts. 
+
+""")
 
 # Top Artists
-st.header("Top Artists of the Year")
+st.subheader("Top Artists of the Year")
 def get_top_artists(sub_df: pd.DataFrame):
     out = {}    
     artist_images = sub_df['artist_image'].to_list()
@@ -123,7 +155,23 @@ for col, top_artist in zip(cols, top_artist_image_dict.keys()):
         # st.header(top_artist)
         st.image(top_artist_image_dict[top_artist], use_column_width='auto', caption=top_artist)
 
+st.write("""
 
+Now, we spotlight the artists behind the top songs in each year. We collate the contributions of each artist across all songs, and pick the artists with maximum contributions to the Top Songs list.
+
+* The 90's start strong with representation from popular bands like U2, Queen and Spice Girls. Strong voices like Whitney Houston and Mariah Carey are popular
+* The 2000's gives rise to popstars in Jennifer Lopez and Brittney Spears. Due to rising influence of hip hop and rap, we see JayZ and 50Cent. Late 2000's spotlights artists that shaped modern day Pop - Lady Gaga, Black Eyed Peas, Katy Perry.
+* 2010's shows domination by artists like Rihanna, Justin Timberlake, Bruno Mars. David Guetta represents rise of Electronic music. Towards 2016-2019, we see the changing trend in listening habits, with more mellow artists like Khalid and Post Malone becoming popular.
+
+Here, we would like to ask and attempt to answer the following questions:
+
+> **Which artists have contributed to top songs through the years? 
+ Are they able to maintain their top spots through the years? 
+ Do bands perform better than single artists?**
+
+The early 90's show that bands can be very successful, however we see lesser representation as the years progress. Multiple artists have been able to maintain high standards, with the likes of Rihanna, Chris Brown, and Bruno Mars holding top spots for multiple consecutive years. 
+
+""")
 
 st.write("---")
 
