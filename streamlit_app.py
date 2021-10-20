@@ -60,7 +60,7 @@ with col1:
         'Genre': genres_dict.keys(),
         'Percentage of Top 100': genres_dict.values()
     }, columns=['Genre', 'Percentage of Top 100'])
-    px_bar = px.bar(df_genre, x='Genre', y='Percentage of Top 100', color='Genre', color_discrete_sequence = px.colors.qualitative.G10, range_y=[0,60])
+    px_bar = px.bar(df_genre, x='Genre', y='Percentage of Top 100', color='Genre', color_discrete_sequence = px.colors.qualitative.G10, range_y=[0,60], title='Genre Representation from 1990-2019 in Top 100 songs')
     st.plotly_chart(px_bar, use_container_width=True)
 
 
@@ -110,7 +110,7 @@ At the start of the 90's we see Rock music domination, followed by Pop music, Ho
 The 2000's saw a rise in Hip Hop, Dance music, as well as R&B, with artists like Beyonce gaining traction. The 2010's did not show much variations, however we see a reintroduction of Rap music into the mainstream.
 
 With this, let's try to answer this question:
-> Did the Golden Era of Hip-Hop (the 90's for those wondering) actually give enough chart toppers? Was it able to compete with Rock and Pop from the top?
+> *Did the Golden Era of Hip-Hop (the 90's for those wondering) actually give enough chart toppers? Was it able to compete with Rock and Pop from the top?*
 
 From the graph it is pretty clear, that Hip Hop and Rap music gained massive popularity through later 90's and early 2000's, through breakthrough artists in the Compton region of NY, Snoop Dogg, Dr. Dre, among others. However, Pop and Rock continue to be the best performing genres, when it comes to Top Songs charts. 
 
@@ -126,16 +126,21 @@ We also spotlight the artists, by collating their contributions across all songs
 
 Here, we would like to ask and attempt to answer the following questions:
 
-> **Which artists have contributed to top songs through the years? 
+> *Which artists have contributed to top songs through the years? 
  Are they able to maintain their top spots through the years? 
- Do bands perform better than single artists?**
+ Do bands perform better than single artists?*
 
 The early 90's show that bands can be very successful, however we see lesser representation as the years progress. Multiple artists have been able to maintain high standards, with the likes of Rihanna, Chris Brown, and Bruno Mars holding top spots for multiple consecutive years. 
 
 """)
 st.write("---")
 st.header("Music Feature Averages through the Years")
-fig = px.line(grouped_melted, x='year', y='value', color='attribute', markers=True)
+fig = px.line(grouped_melted, x='year', y='value', color='attribute', markers=True,
+labels={
+    "year": "Year",
+    "value": "Normalized Audio Feature Values",
+    "attribute": "Audio Features"
+}, title='Average audio features from 1990-2019')
 st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("Description of the Features"):
@@ -170,14 +175,18 @@ st.write("---")
 
 st.header("Do Social and Music trends run parallel?")
 st.write("""
-> *Do trends in music run in parallel to social trends? Do women artists have enough representation at the top of the charts? Has consumption of explicit content been normalized over the years? *
+> *Do trends in music run in parallel to social trends? Do women artists have enough representation at the top of the charts? Has consumption of explicit content been normalized over the years?*
 
 Music is the representation of the good and bad of the society. Answering the questions above, through the years, women artists have consistently performed at the highest level, with almost all sets of Top 3 Artists every year has at least one woman artist. From Whitney Houston, to the Spice Girls, to Rihanna, to finally Dua Lipa, Selena Gomez, we see women dominating the music industry. 
 """)
 year_explicit = spotify_data[["year","explicit"]].copy()
 year_explicit["explicit"] = year_explicit['explicit'].astype('int64')
 year_explicit = year_explicit.groupby("year").sum().reset_index()
-fig = px.line(year_explicit, x='year', y='explicit', markers=True)
+fig = px.line(year_explicit, x='year', y='explicit', markers=True, labels={
+    'year': 'Year',
+    'explicit': '# of songs in Top 100'
+}, title='Trend of Explicit lyrics in Top 100 songs')
+fig.update_traces(line=dict(color="MediumSeaGreen", width=5))
 st.plotly_chart(fig, use_container_width=True)
 
 st.write("""
@@ -187,7 +196,7 @@ st.write("---")
 
 st.header("Features affecting Popularity")
 st.write("""
-> What features contribute to the success of a track?
+> *What features contribute to the success of a track?*
 
 We now look at features of songs that affect popularity the most. For this we select features which have the highest values for the test chi-squared statistic, relative to the popularity metric.
 
