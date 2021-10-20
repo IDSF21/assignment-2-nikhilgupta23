@@ -25,56 +25,49 @@ spotify_data = pd.read_csv('spotify_data.csv')
 spotify_data['normalized_tempo'] = (spotify_data['tempo'] - spotify_data['tempo'].min()) / (spotify_data['tempo'].max() - spotify_data['tempo'].min())
 grouped = spotify_data.groupby('year').mean()
 
-st.header("Music Trends through the years!")
+st.write("We present a small preview into the history of the music industry, using data collected from a popular music streaming service, Spotify. Music is an essential part of every individual's life; we try to capture the trends and shifts of influence, of different genres, and different artists, through the years, to answer some compelling questions.")
+st.write("---")
 
+
+st.header("Music Feature Averages through the Years")
 grouped = grouped.reset_index()
 grouped_melted = grouped.melt(id_vars = ["year"], value_vars = factors, var_name = "attribute", value_name = "value")
 
 fig = px.line(grouped_melted, x='year', y='value', color='attribute', markers=True)
 st.plotly_chart(fig, use_container_width=True)
 
-st.write("""
+with st.expander("Description of the Features"):
+    st.write("""
 
-Here is a brief description of the features, to help make sense of the above graph
+    Here is a brief description of the features, to help make sense of the above graph
 
-* Danceability: Danceability describes how suitable a track is for dancing based on a combination of musical elements
-* Energy: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy.
-* Instrumentalness: Predicts whether a track contains no vocals.
-* Liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. 
-* Loudness: The overall loudness of a track in decibels (dB). 
-* Speechiness: Speechiness detects the presence of spoken words in a track. 
-* Tempo: The overall estimated tempo of a track in beats per minute (BPM)
-* Valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+    * Danceability: Danceability describes how suitable a track is for dancing based on a combination of musical elements
+    * Energy: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy.
+    * Instrumentalness: Predicts whether a track contains no vocals.
+    * Liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. 
+    * Loudness: The overall loudness of a track in decibels (dB). 
+    * Speechiness: Speechiness detects the presence of spoken words in a track. 
+    * Tempo: The overall estimated tempo of a track in beats per minute (BPM)
+    * Valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
 
-(Source: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
-
-""")
+    (Source: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
+    """)
 
 st.subheader('What we observe')
-
 st.write("""
-
 Let's first look at the trend of features in the 21st Century
 
 * We see that 2000 starts out with happy, positive songs (high valence scores) full of energy
 * Focusing on *Speechiness*, we see that the songs in 2000's have more wordings than those later in the decade. This is due to the high population of **Rap/Hip Hop** songs, that have more words, hence higher speechiness scores. 
 * As we travel through time to reach the 2010's, we see a downtrend in the general energy and valence of the songs released, and appreciated by listeners. This can be seen via the rise of artists like Khalid and The Weeknd, who tend to have mellow beats, and sullen themes. 
 * Today's music scene is characterized by lower energy, higher acousticness, more lyrics, and more mellow themes as compared to the last 5 years. Music by Billie Eilish is a prime example of the music this generation appreciates, and captures this trend
-
-
----
-
 """)
 
-
-# -------------------------------------------------------------------------------------------------------
-
-# Genres Distribution
-option = st.slider('Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
-
+st.write("---")
+option = st.slider('Select a Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
 st.header('Year in Focus: ' + str(option))
 
-st.subheader("Genres in Top 100")
+st.subheader("Genres in the Yearly Top 100")
 
 def normalize(d, target=1.0):
    raw = sum(d.values())
@@ -106,25 +99,12 @@ with col1:
 
 
 with col2:
+    st.write("")
+    st.write("")
     st.subheader("Top Genres")
     yearly_top_genres = sorted(genres_dict, key=genres_dict.get, reverse=True)[:5]
     for genre in yearly_top_genres:
         st.write('##### ' + genre)
-
-st.write("""
-
-Here, we present a journey through time, looking at the composition of the Top 100 songs classified by genre, over the last 30 years. Spotify gave us multiple different genres, however we have considered the parent genres in this analysis (Example: Alternative Rock, Classic Rock -> Rock, Tropical House, Electro House, Deep House -> House). 
-
-At the start of the 90's we see Rock music domination, followed by Pop music, House and Dance music following. Mid to late 90's show an upward trend in Pop Music, and influence of Rock Music is reducing. However, there is a new genre being nurtured, which is Hip Hop. The 90's are considered the Golden Age for Hip Hop and Rap music. 
-
-The 2000's saw a rise in Hip Hop, Dance music, as well as R&B, with artists like Beyonce gaining traction. The 2010's did not show much variations, however we see a reintroduction of Rap music into the mainstream.
-
-With this, let's try to answer this question:
-> Did the Golden Era of Hip-Hop (the 90's for those wondering) actually give enough chart toppers? Was it able to compete with Rock and Pop from the top?
-
-From the graph it is pretty clear, that Hip Hop and Rap music gained massive popularity through later 90's and early 2000's, through breakthrough artists in the Compton region of NY, Snoop Dogg, Dr. Dre, among others. However, Pop and Rock continue to be the best performing genres, when it comes to Top Songs charts. 
-
-""")
 
 # Top Artists
 st.subheader("Top Artists of the Year")
@@ -153,6 +133,22 @@ for col, top_artist in zip(cols, top_artist_image_dict.keys()):
     with col:
         # st.header(top_artist)
         st.image(top_artist_image_dict[top_artist], use_column_width='auto', caption=top_artist)
+
+
+st.write("""
+
+Here, we present a journey through time, looking at the composition of the Top 100 songs classified by genre, over the last 30 years. Spotify gave us multiple different genres, however we have considered the parent genres in this analysis (Example: Alternative Rock, Classic Rock -> Rock, Tropical House, Electro House, Deep House -> House). 
+
+At the start of the 90's we see Rock music domination, followed by Pop music, House and Dance music following. Mid to late 90's show an upward trend in Pop Music, and influence of Rock Music is reducing. However, there is a new genre being nurtured, which is Hip Hop. The 90's are considered the Golden Age for Hip Hop and Rap music. 
+
+The 2000's saw a rise in Hip Hop, Dance music, as well as R&B, with artists like Beyonce gaining traction. The 2010's did not show much variations, however we see a reintroduction of Rap music into the mainstream.
+
+With this, let's try to answer this question:
+> Did the Golden Era of Hip-Hop (the 90's for those wondering) actually give enough chart toppers? Was it able to compete with Rock and Pop from the top?
+
+From the graph it is pretty clear, that Hip Hop and Rap music gained massive popularity through later 90's and early 2000's, through breakthrough artists in the Compton region of NY, Snoop Dogg, Dr. Dre, among others. However, Pop and Rock continue to be the best performing genres, when it comes to Top Songs charts. 
+
+""")
 
 st.write("""
 
@@ -183,17 +179,15 @@ In this section, we look at how different audio-features correlate with each oth
 
 """)
 
-corr = spotify_data[factors + ['popularity']].corr()
+corr = spotify_data[factors].corr()
 # corr.style.background_gradient(cmap='coolwarm')
-fig, ax = plt.subplots()
-sns.heatmap(corr, ax=ax)
-st.write(fig)
+st.plotly_chart(px.imshow(corr))
 
 st.write("""
 
 1. The first most striking correlation is negative, between acousticness and energy. This is *highly intuitive* from the definitions of both features. As the acousticness of the song increases, the song loses energy, becomes slower, and more mellow.
 1. Which leads to our next inference, which is the negative correlation between valence and acousticness. Again our argument is similar.
-1. Moving on to positive correlations, we see that the triad of features: **Danceability, Energy, and Valence**, are all tightly correlated. As we know and understand music, more the energy and happiness conveyed through the song, the more 'danceable' it becomes
+1. Moving on to positive correlations, we see that the triad of features: **Danceability, Energy, and Valence**, are all tightly correlated. As we know and understand music, more the energy and happiness conveyed through the song, the more 'danceable' it becomes.
 1. An interesting observation is the relationship between tempo and danceability. Danceable songs are typically not very fast nor slow. However, tempo is not the only contributing factor, hence we can not make strong arguments in this case.
 
 ---
@@ -201,6 +195,7 @@ st.write("""
 
 st.header("Features affecting Popularity")
 st.write("""We now look at features of songs that affect popularity the most. For this we select features which have the highest values for the test chi-squared statistic, relative to the popularity metric.
+
 Note that the popularity metric of a song tells us about how popular the song is at the present time, so we only included songs from the last decade because songs before that may not be listened as frequently as more recent ones.
 """)
 
@@ -220,7 +215,7 @@ for col, top_factor in zip(cols,top_factors):
         delta = "Popularity" if corr['popularity'][top_factor] > 0 else "- Popularity"
         st.metric(label="", value=top_factor, delta=delta)
 
-
+st.write("---")
 st.header("Explicitness through the Years")
 year_explicit = spotify_data[["year","explicit"]].copy()
 year_explicit["explicit"] = year_explicit['explicit'].astype('int64')
