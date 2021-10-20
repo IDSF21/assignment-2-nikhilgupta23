@@ -1,4 +1,3 @@
-import altair as alt
 import pandas as pd
 import streamlit as st
 from collections import Counter
@@ -6,6 +5,7 @@ import ast
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.feature_selection import SelectKBest, chi2
+import plotly.express as px
 
 st.set_page_config(  # Alternate names: setup_page, page, layout
 	layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
@@ -24,9 +24,6 @@ spotify_data = pd.read_csv('spotify_data.csv')
 # spotify_data = spotify_data[spotify_data['rank_year'] < 21]]
 spotify_data['normalized_tempo'] = (spotify_data['tempo'] - spotify_data['tempo'].min()) / (spotify_data['tempo'].max() - spotify_data['tempo'].min())
 grouped = spotify_data.groupby('year').mean()
-
-##########################################################################################################
-# Global Stuff
 
 st.header("Music Trends through the years!")
 
@@ -52,13 +49,15 @@ Here is a brief description of the features, to help make sense of the above gra
 
 (Source: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
 
+---
+
 """)
 
 option = st.slider('Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
-st.title('The Year ' + str(option))
+st.header('Year in Focus: ' + str(option))
 
 # Genres Distribution
-st.header("Genres in Top 100")
+st.subheader("Genres in Top 100")
 
 def normalize(d, target=1.0):
    raw = sum(d.values())
@@ -81,11 +80,14 @@ genres_dict = get_genres_dist(spotify_data[spotify_data['year']==option])
 col1, col2 = st.columns([3,1])
 
 with col1:
-    c = alt.Chart(pd.DataFrame(genres_dict.items(), columns=['Genres', 'Percentage'])).mark_bar().encode(
-        x='Genres',
-        y='Percentage'
-    )
-    st.altair_chart(c, use_container_width=True)
+    df_genre = pd.DataFrame({
+        'Genre': genres_dict.keys(),
+        'Percentage of Top 100': genres_dict.values()
+    }, columns=['Genre', 'Percentage of Top 100'])
+    px_bar = px.bar(df_genre, x='Genre', y='Percentage of Top 100', color='Genre', color_discrete_sequence = px.colors.qualitative.G10, range_y=[0,50])
+    st.plotly_chart(px_bar, use_container_width=True)
+
+
 with col2:
     st.subheader("Top 3 Genres")
     yearly_top_genres = sorted(genres_dict, key=genres_dict.get, reverse=True)[:3]
@@ -126,8 +128,7 @@ for col, top_artist in zip(cols, top_artist_image_dict.keys()):
 st.write("---")
 
 # Feature Correlation
-sns.set_style("dark")
-st.header("Music Features")
+st.header("Music Feature Correlation")
 
 st.write("""
 
@@ -153,7 +154,6 @@ st.write("""
 
 st.header("Features affecting Popularity")
 st.write("""We now look at features of songs that affect popularity the most. For this we select features which have the highest values for the test chi-squared statistic, relative to the popularity metric.
-
 Note that the popularity metric of a song tells us about how popular the song is at the present time, so we only included songs from the last decade because songs before that may not be listened as frequently as more recent ones.
 """)
 
@@ -180,7 +180,6 @@ year_explicit["explicit"] = year_explicit['explicit'].astype('int64')
 year_explicit = year_explicit.groupby("year").sum().reset_index()
 fig = px.line(year_explicit, x='year', y='explicit', markers=True)
 st.plotly_chart(fig, use_container_width=True)
-
 
 # year_explicit['decade'] = ((year_explicit["year"] / 10).astype('int64')*10).astype(str) + 's'
 # st.plotly_chart(px.sunburst(year_explicit, names='year', parents='decade', values='explicit', branchvalues="total"))
