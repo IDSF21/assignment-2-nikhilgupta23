@@ -9,6 +9,7 @@ For this project, we applied the principles and concepts learnt earlier in this 
 * Obtain the list of Song IDs from each playlist, and store them according to year
 * Obtain metadata for each song (audio-features), genre and artist-based information
 * Combine into a single dataframe and export to CSV
+* Use Genius Lyrics API to obtain lyrics for all songs: Search for artist and song names, and then combine the existing dataframe with lyrics obtained
 
 ## Motivation and Goals
 
@@ -18,7 +19,7 @@ We look at answering interesting questions around:
 1. How have listener preferences changed through the decades? Did the Golden Era of Hip-Hop (the 90's for those wondering) actually give enough chart toppers? Was it able to compete with Rock and Pop from the top?
 1. Which artists have contributed to top songs through the years? Are they able to maintain their top spots through the years? Do bands perform better than single artists?
 1. What features contribute to the success of a track? An investigation into understanding most influential features contributing to success
-1. Do trends in music run in parallel to social trends? Do women artists have enough representation at the top of the charts? Has consumption of explicit content been normalized over the years?
+1. Do trends in music run in parallel to social trends? Do women artists have enough representation at the top of the charts? Has consumption of explicit content been normalized over the years? What do songs talk about mostly, have artists been talking about the same things over the years?
 
 ## Design Thinking: Process and Visualizations
 
@@ -27,7 +28,9 @@ Questions we look to answer through our visualizations:
     1. We move through the years to understand and analyse how different audio-features contribute to the success of a track. We do this in a fluid fashion, with a slider, and individual line graphs with tooltips for *each* audio feature.
     1. We again incorporate a slider to understand how each genre stacks up, in its composition of the top 100 songs each year. Here we use bar graphs, to understand differences in values effectively. 
     1. To add some pizzazz to our visualizations, we select the best performing artists, and showcase them on our *Artist Highlight!*. We are able to make some interesting inferences based on these visualizations
-* To be updated after some more Visualizations
+* Lyrics:
+    1. We process text from lyrics to get wordclouds over songs of a year. Wordclouds provide insights into multiple perspectives: of the society, artist mindset, and state of affairs.
+
 
 ## Development Process Overview
 
@@ -37,6 +40,6 @@ We split the tasks equally between us through all processes of the assignment. O
 * Making inferences and observations based on the questions we asked
 
 ### Time Analysis
-* ~6 hours on Data Curation
+* ~8 hours on Data Curation
 * ~7 hours on Learning Streamlit, Creating Visualizations + Code
 * ~4 hours on Inferences, Writeup, Deployment
