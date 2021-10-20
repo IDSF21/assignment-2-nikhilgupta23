@@ -27,43 +27,9 @@ grouped = spotify_data.groupby('year').mean()
 
 st.write("We present a small preview into the history of the music industry, using data collected from a popular music streaming service, Spotify. Music is an essential part of every individual's life; we try to capture the trends and shifts of influence, of different genres, and different artists, through the years, to answer some compelling questions.")
 st.write("---")
-
-
-st.header("Music Feature Averages through the Years")
 grouped = grouped.reset_index()
 grouped_melted = grouped.melt(id_vars = ["year"], value_vars = factors, var_name = "attribute", value_name = "value")
 
-fig = px.line(grouped_melted, x='year', y='value', color='attribute', markers=True)
-st.plotly_chart(fig, use_container_width=True)
-
-with st.expander("Description of the Features"):
-    st.write("""
-
-    Here is a brief description of the features, to help make sense of the above graph
-
-    * Danceability: Danceability describes how suitable a track is for dancing based on a combination of musical elements
-    * Energy: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy.
-    * Instrumentalness: Predicts whether a track contains no vocals.
-    * Liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. 
-    * Loudness: The overall loudness of a track in decibels (dB). 
-    * Speechiness: Speechiness detects the presence of spoken words in a track. 
-    * Tempo: The overall estimated tempo of a track in beats per minute (BPM)
-    * Valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
-
-    (Source: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
-    """)
-
-st.subheader('What we observe')
-st.write("""
-Let's first look at the trend of features in the 21st Century
-
-* We see that 2000 starts out with happy, positive songs (high valence scores) full of energy
-* Focusing on *Speechiness*, we see that the songs in 2000's have more wordings than those later in the decade. This is due to the high population of **Rap/Hip Hop** songs, that have more words, hence higher speechiness scores. 
-* As we travel through time to reach the 2010's, we see a downtrend in the general energy and valence of the songs released, and appreciated by listeners. This can be seen via the rise of artists like Khalid and The Weeknd, who tend to have mellow beats, and sullen themes. 
-* Today's music scene is characterized by lower energy, higher acousticness, more lyrics, and more mellow themes as compared to the last 5 years. Music by Billie Eilish is a prime example of the music this generation appreciates, and captures this trend
-""")
-
-st.write("---")
 option = st.slider('Select a Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
 st.header('Year in Focus: ' + str(option))
 
@@ -152,7 +118,7 @@ From the graph it is pretty clear, that Hip Hop and Rap music gained massive pop
 
 st.write("""
 
-Now, we spotlight the artists behind the top songs in each year. We collate the contributions of each artist across all songs, and pick the artists with maximum contributions to the Top Songs list.
+We also spotlight the artists, by collating their contributions across all songs, and pick those with maximum contributions to the Top Songs list.
 
 * The 90's start strong with representation from popular bands like U2, Queen and Spice Girls. Strong voices like Whitney Houston and Mariah Carey are popular
 * The 2000's gives rise to popstars in Jennifer Lopez and Brittney Spears. Due to rising influence of hip hop and rap, we see JayZ and 50Cent. Late 2000's spotlights artists that shaped modern day Pop - Lady Gaga, Black Eyed Peas, Katy Perry.
@@ -167,9 +133,84 @@ Here, we would like to ask and attempt to answer the following questions:
 The early 90's show that bands can be very successful, however we see lesser representation as the years progress. Multiple artists have been able to maintain high standards, with the likes of Rihanna, Chris Brown, and Bruno Mars holding top spots for multiple consecutive years. 
 
 """)
+st.write("---")
+st.header("Music Feature Averages through the Years")
+fig = px.line(grouped_melted, x='year', y='value', color='attribute', markers=True)
+st.plotly_chart(fig, use_container_width=True)
+
+with st.expander("Description of the Features"):
+    st.write("""
+
+    Here is a brief description of the features, to help make sense of the above graph
+
+    * Danceability: Danceability describes how suitable a track is for dancing based on a combination of musical elements
+    * Energy: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy.
+    * Instrumentalness: Predicts whether a track contains no vocals.
+    * Liveness: Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. 
+    * Loudness: The overall loudness of a track in decibels (dB). 
+    * Speechiness: Speechiness detects the presence of spoken words in a track. 
+    * Tempo: The overall estimated tempo of a track in beats per minute (BPM)
+    * Valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+
+    (Source: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
+    """)
+
+st.subheader('What we observe')
+st.write("""
+Let's first look at the trend of features in the 21st Century
+
+* We see that 2000 starts out with happy, positive songs (high valence scores) full of energy
+* Focusing on *Speechiness*, we see that the songs in 2000's have more wordings than those later in the decade. This is due to the high population of **Rap/Hip Hop** songs, that have more words, hence higher speechiness scores. 
+* As we travel through time to reach the 2010's, we see a downtrend in the general energy and valence of the songs released, and appreciated by listeners. This can be seen via the rise of artists like Khalid and The Weeknd, who tend to have mellow beats, and sullen themes. 
+* Today's music scene is characterized by lower energy, higher acousticness, more lyrics, and more mellow themes as compared to the last 5 years. Music by Billie Eilish is a prime example of the music this generation appreciates, and captures this trend
+""")
+
 
 st.write("---")
 
+st.header("Do Social and Music trends run parallel?")
+st.write("""
+> *Do trends in music run in parallel to social trends? Do women artists have enough representation at the top of the charts? Has consumption of explicit content been normalized over the years? *
+
+Music is the representation of the good and bad of the society. Answering the questions above, through the years, women artists have consistently performed at the highest level, with almost all sets of Top 3 Artists every year has at least one woman artist. From Whitney Houston, to the Spice Girls, to Rihanna, to finally Dua Lipa, Selena Gomez, we see women dominating the music industry. 
+""")
+year_explicit = spotify_data[["year","explicit"]].copy()
+year_explicit["explicit"] = year_explicit['explicit'].astype('int64')
+year_explicit = year_explicit.groupby("year").sum().reset_index()
+fig = px.line(year_explicit, x='year', y='explicit', markers=True)
+st.plotly_chart(fig, use_container_width=True)
+
+st.write("""
+Next we talk about how music influences the younger generations through explicit content. As we observe, explicit content in songs has been on the rise through the years. It is very important that we understand how influential music with explicit content can be on younger minds, and be mindful of normalizing this trend. 
+""")
+st.write("---")
+
+st.header("Features affecting Popularity")
+st.write("""
+> What features contribute to the success of a track?
+
+We now look at features of songs that affect popularity the most. For this we select features which have the highest values for the test chi-squared statistic, relative to the popularity metric.
+
+Note that the popularity metric of a song tells us about how popular the song is at the present time, so we only included songs from the last decade because songs before that may not be listened as frequently as more recent ones.
+""")
+
+spotify_data_without_na = spotify_data.dropna(how='any')
+spotify_data_without_na = spotify_data_without_na[spotify_data_without_na['year'] >= 2010]
+X = spotify_data_without_na[factors]
+y = spotify_data_without_na[['popularity']]
+k = 3
+k_best = SelectKBest(chi2, k=k)
+k_best.fit_transform(X, y)
+
+top_factors = spotify_data_without_na[factors].columns[k_best.get_support()].to_list()
+corr = spotify_data[top_factors + ['popularity']].corr()
+cols = st.columns(k)
+for col, top_factor in zip(cols,top_factors):
+    with col:
+        delta = "Popularity" if corr['popularity'][top_factor] > 0 else "- Popularity"
+        st.metric(label="", value=top_factor, delta=delta)
+
+st.write("---")
 # Feature Correlation
 st.header("Music Feature Correlation")
 
@@ -192,36 +233,3 @@ st.write("""
 
 ---
 """)
-
-st.header("Features affecting Popularity")
-st.write("""We now look at features of songs that affect popularity the most. For this we select features which have the highest values for the test chi-squared statistic, relative to the popularity metric.
-
-Note that the popularity metric of a song tells us about how popular the song is at the present time, so we only included songs from the last decade because songs before that may not be listened as frequently as more recent ones.
-""")
-
-spotify_data_without_na = spotify_data.dropna(how='any')
-spotify_data_without_na = spotify_data_without_na[spotify_data_without_na['year'] >= 2010]
-X = spotify_data_without_na[factors]
-y = spotify_data_without_na[['popularity']]
-k = 3
-k_best = SelectKBest(chi2, k=k)
-k_best.fit_transform(X, y)
-
-top_factors = spotify_data_without_na[factors].columns[k_best.get_support()].to_list()
-corr = spotify_data[top_factors + ['popularity']].corr()
-cols = st.columns(k)
-for col, top_factor in zip(cols,top_factors):
-    with col:
-        delta = "Popularity" if corr['popularity'][top_factor] > 0 else "- Popularity"
-        st.metric(label="", value=top_factor, delta=delta)
-
-st.write("---")
-st.header("Explicitness through the Years")
-year_explicit = spotify_data[["year","explicit"]].copy()
-year_explicit["explicit"] = year_explicit['explicit'].astype('int64')
-year_explicit = year_explicit.groupby("year").sum().reset_index()
-fig = px.line(year_explicit, x='year', y='explicit', markers=True)
-st.plotly_chart(fig, use_container_width=True)
-
-# year_explicit['decade'] = ((year_explicit["year"] / 10).astype('int64')*10).astype(str) + 's'
-# st.plotly_chart(px.sunburst(year_explicit, names='year', parents='decade', values='explicit', branchvalues="total"))
