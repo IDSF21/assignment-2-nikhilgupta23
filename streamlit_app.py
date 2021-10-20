@@ -5,6 +5,7 @@ from collections import Counter
 import ast
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.set_page_config(  # Alternate names: setup_page, page, layout
 	layout="centered",  # Can be "centered" or "wide". In the future also "dashboard", etc.
@@ -51,13 +52,15 @@ Here is a brief description of the features, to help make sense of the above gra
 
 (Source: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
 
+---
+
 """)
 
 option = st.slider('Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
-st.title('The Year ' + str(option))
+st.header('Year in Focus: ' + str(option))
 
 # Genres Distribution
-st.header("Genres in Top 100")
+st.subheader("Genres in Top 100")
 
 def normalize(d, target=1.0):
    raw = sum(d.values())
@@ -80,11 +83,14 @@ genres_dict = get_genres_dist(spotify_data[spotify_data['year']==option])
 col1, col2 = st.columns([3,1])
 
 with col1:
-    c = alt.Chart(pd.DataFrame(genres_dict.items(), columns=['Genres', 'Percentage'])).mark_bar().encode(
-        x='Genres',
-        y='Percentage'
-    )
-    st.altair_chart(c, use_container_width=True)
+    df_genre = pd.DataFrame({
+        'Genre': genres_dict.keys(),
+        'Percentage of Top 100': genres_dict.values()
+    }, columns=['Genre', 'Percentage of Top 100'])
+    px_bar = px.bar(df_genre, x='Genre', y='Percentage of Top 100', color='Genre', color_discrete_sequence = px.colors.qualitative.G10, range_y=[0,50])
+    st.plotly_chart(px_bar, use_container_width=True)
+
+
 with col2:
     st.subheader("Top 3 Genres")
     yearly_top_genres = sorted(genres_dict, key=genres_dict.get, reverse=True)[:3]
@@ -124,7 +130,6 @@ for col, top_artist in zip(cols, top_artist_image_dict.keys()):
 
 
 # Feature Correlation
-sns.set_style("dark")
 st.header("Music Feature Correlation")
 
 st.write("""
@@ -148,6 +153,8 @@ st.write("""
 
 """)
 
+
+"""
 ##########################################################################################################
 # Yearly Stuff
 
@@ -218,3 +225,4 @@ for col, top_artist in zip(cols, top_artist_image_dict.keys()):
         st.image(top_artist_image_dict[top_artist], use_column_width='auto', caption=top_artist)
 
 ##########################################################################################################
+"""
