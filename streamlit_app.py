@@ -30,7 +30,6 @@ st.header("Music Trends through the years!")
 grouped = grouped.reset_index()
 grouped_melted = grouped.melt(id_vars = ["year"], value_vars = factors, var_name = "attribute", value_name = "value")
 
-import plotly.express as px
 fig = px.line(grouped_melted, x='year', y='value', color='attribute', markers=True)
 st.plotly_chart(fig, use_container_width=True)
 
@@ -89,8 +88,8 @@ with col1:
 
 
 with col2:
-    st.subheader("Top 3 Genres")
-    yearly_top_genres = sorted(genres_dict, key=genres_dict.get, reverse=True)[:3]
+    st.subheader("Top Genres")
+    yearly_top_genres = sorted(genres_dict, key=genres_dict.get, reverse=True)[:5]
     for genre in yearly_top_genres:
         st.write('##### ' + genre)
 
