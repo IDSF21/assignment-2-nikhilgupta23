@@ -5,9 +5,10 @@ from collections import Counter
 import ast
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.feature_selection import SelectKBest, chi2
 
 st.set_page_config(  # Alternate names: setup_page, page, layout
-	layout="centered",  # Can be "centered" or "wide". In the future also "dashboard", etc.
+	layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
 	initial_sidebar_state="auto",  # Can be "auto", "expanded", "collapsed"
 	page_title="A Journey through time with Music",  # String or None. Strings get appended with "• Streamlit". 
 	page_icon="🎵",  # String, anything supported by st.image, or None.
@@ -107,7 +108,8 @@ def get_top_artists(sub_df: pd.DataFrame):
     for top_artist in top_artists:
         for top_song_artist_list in artists:
             if top_artist in top_song_artist_list:
-                out[top_artist] = artist_images[artists.index(top_song_artist_list)]
+                artist_images_list = ast.literal_eval(artist_images[artists.index(top_song_artist_list)])                
+                out[top_artist] = artist_images_list[top_song_artist_list.index(top_artist)]
                 break
 
     return out
@@ -121,11 +123,11 @@ for col, top_artist in zip(cols, top_artist_image_dict.keys()):
 
 
 
-
+st.write("---")
 
 # Feature Correlation
 sns.set_style("dark")
-st.header("Music Feature Correlation")
+st.header("Music Features")
 
 st.write("""
 
@@ -146,75 +148,39 @@ st.write("""
 1. Moving on to positive correlations, we see that the triad of features: **Danceability, Energy, and Valence**, are all tightly correlated. As we know and understand music, more the energy and happiness conveyed through the song, the more 'danceable' it becomes
 1. An interesting observation is the relationship between tempo and danceability. Danceable songs are typically not very fast nor slow. However, tempo is not the only contributing factor, hence we can not make strong arguments in this case.
 
+---
 """)
 
-##########################################################################################################
-# Yearly Stuff
+st.header("Features affecting Popularity")
+st.write("""We now look at features of songs that affect popularity the most. For this we select features which have the highest values for the test chi-squared statistic, relative to the popularity metric.
 
-option = st.slider('Year', min(grouped["year"].to_list()), max(grouped["year"].to_list()), step=1)
-st.title('The Year ' + str(option))
+Note that the popularity metric of a song tells us about how popular the song is at the present time, so we only included songs from the last decade because songs before that may not be listened as frequently as more recent ones.
+""")
 
-# Genres Distribution
-st.header("Genres in Top 100")
+spotify_data_without_na = spotify_data.dropna(how='any')
+spotify_data_without_na = spotify_data_without_na[spotify_data_without_na['year'] >= 2010]
+X = spotify_data_without_na[factors]
+y = spotify_data_without_na[['popularity']]
+k = 3
+k_best = SelectKBest(chi2, k=k)
+k_best.fit_transform(X, y)
 
-def normalize(d, target=1.0):
-   raw = sum(d.values())
-   factor = (target/raw) * 100
-   return {key:value*factor for key,value in d.items()}
-
-def get_genres_dist(sub_df: pd.DataFrame):
-    genres = sub_df['artist_genres'].to_list()
-    genres = [ast.literal_eval(genre) for genre in genres]
-    flat_genre = [item for sublist in genres for item in sublist]
-    genre_freq = {major_genre: 0 for major_genre in major_genres}
-    for song_genre in flat_genre:
-        for major_genre in major_genres:
-            if major_genre.casefold() in song_genre.casefold():
-                genre_freq[major_genre] = genre_freq[major_genre] + 1
-    genre_freq = normalize(genre_freq)
-    return genre_freq
-
-genres_dict = get_genres_dist(spotify_data[spotify_data['year']==option])
-col1, col2 = st.columns([3,1])
-
-with col1:
-    c = alt.Chart(pd.DataFrame(genres_dict.items(), columns=['Genres', 'Percentage'])).mark_bar().encode(
-        x='Genres',
-        y='Percentage'
-    )
-    st.altair_chart(c, use_container_width=True)
-with col2:
-    st.subheader("Top 3 Genres")
-    yearly_top_genres = sorted(genres_dict, key=genres_dict.get, reverse=True)[:3]
-    for genre in yearly_top_genres:
-        st.write('##### ' + genre)
-
-
-# Top Artists
-st.header("Top Artists of the Year")
-def get_top_artists(sub_df: pd.DataFrame):
-    out = {}    
-    artist_images = sub_df['artist_image'].to_list()
-    artists = sub_df['artists'].to_list()
-    artists = [ast.literal_eval(artist) for artist in artists]
-    flat_artists = [item for sublist in artists for item in sublist]
-
-    most_common_artists = Counter(flat_artists).most_common(3)
-    # st.write(most_common_artists)
-    top_artists = [common[0] for common in most_common_artists]
-    for top_artist in top_artists:
-        for top_song_artist_list in artists:
-            if top_artist in top_song_artist_list:
-                out[top_artist] = artist_images[artists.index(top_song_artist_list)]
-                break
-
-    return out
-
-top_artist_image_dict = get_top_artists(spotify_data[spotify_data['year']==option])
-cols = st.columns(len(top_artist_image_dict))
-for col, top_artist in zip(cols, top_artist_image_dict.keys()):
+top_factors = spotify_data_without_na[factors].columns[k_best.get_support()].to_list()
+corr = spotify_data[top_factors + ['popularity']].corr()
+cols = st.columns(k)
+for col, top_factor in zip(cols,top_factors):
     with col:
-        # st.header(top_artist)
-        st.image(top_artist_image_dict[top_artist], use_column_width='auto', caption=top_artist)
+        delta = "Popularity" if corr['popularity'][top_factor] > 0 else "- Popularity"
+        st.metric(label="", value=top_factor, delta=delta)
 
-##########################################################################################################
+
+st.header("Explicitness through the Years")
+year_explicit = spotify_data[["year","explicit"]].copy()
+year_explicit["explicit"] = year_explicit['explicit'].astype('int64')
+year_explicit = year_explicit.groupby("year").sum().reset_index()
+fig = px.line(year_explicit, x='year', y='explicit', markers=True)
+st.plotly_chart(fig, use_container_width=True)
+
+
+# year_explicit['decade'] = ((year_explicit["year"] / 10).astype('int64')*10).astype(str) + 's'
+# st.plotly_chart(px.sunburst(year_explicit, names='year', parents='decade', values='explicit', branchvalues="total"))
